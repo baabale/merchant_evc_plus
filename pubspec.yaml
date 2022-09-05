@@ -1,10 +1,10 @@
 name: merchant_evc_plus
 description: Hormuud EvcPlus Merchant API Plugin
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/baabale/merchant_evc_plus
 
 environment:
-  sdk: ">=2.15.0 <3.0.0"
+  sdk: ">=2.18.0 <3.0.0"
   flutter: ">=1.17.0"
 
 dependencies:

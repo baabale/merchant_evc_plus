@@ -8,6 +8,15 @@ import 'package:merchant_evc_plus/models/transaction_info.dart';
 
 export './models/transaction_info.dart';
 
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
+
 class MerchantEvcPlus {
   final String endPoint;
   final String merchantUid;
@@ -15,7 +24,7 @@ class MerchantEvcPlus {
   final String apiKey;
 
   const MerchantEvcPlus({
-    this.endPoint = 'https://api.waafi.com/asm',
+    this.endPoint = 'https://api.waafipay.net/asm',
     required this.merchantUid,
     required this.apiUserId,
     required this.apiKey,
@@ -26,6 +35,8 @@ class MerchantEvcPlus {
     Function()? onSuccess,
     Function(String)? onFailure,
   }) async {
+    // HttpOverrides.global = MyHttpOverrides();
+
     try {
       http.Response response = await http.post(
         Uri.parse(endPoint),
@@ -61,7 +72,9 @@ class MerchantEvcPlus {
         }
         String message = '';
         var errMessage = data['responseMsg'].toString().split(':');
-        if (errMessage[2] == ' User Aborted)') {
+        if (errMessage.length < 2) {
+          message = 'RCS_USER_IS_NOT_AUTHZ_TO_ACCESS_API';
+        } else if (errMessage[2] == ' User Aborted)') {
           message = 'User Cancelled';
         } else if (errMessage[2] == ' Subscriber Not Found)') {
           message = 'Wrong Telephone Number';
@@ -84,6 +97,7 @@ class MerchantEvcPlus {
     } on SocketException {
       onFailure!('No Internet Connection');
     } catch (e) {
+      print(e);
       onFailure!(e.toString());
     }
   }
