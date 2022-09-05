@@ -33,7 +33,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final _formKey = GlobalKey<FormState>();
-  late String merchantUid, apiUserId, apiKey;
+  late String merchantUid, apiUserId, apiKey, phone;
+  late num amount;
   bool isLoading = false;
 
   void makePayment() async {
@@ -48,8 +49,11 @@ class _MyHomePageState extends State<MyHomePage> {
         );
         setState(() => isLoading = !isLoading);
         await merchantEvcPlus.makePayment(
-          transactionInfo:
-              TransactionInfo(payerPhoneNumber: '252616102387', amount: 0.01),
+          transactionInfo: TransactionInfo(
+            payerPhoneNumber: phone,
+            amount: amount,
+            invoiceId: 'INV-PLAN-Test',
+          ),
           onSuccess: () {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text('Payment Successful'),
@@ -134,6 +138,53 @@ class _MyHomePageState extends State<MyHomePage> {
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'API Key',
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text('Testing Section'),
+                    const SizedBox(height: 10),
+                    // Testing Fields
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 20),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            validator: (value) {
+                              if (value != null) if (value.isEmpty)
+                                return 'Field required';
+                            },
+                            onSaved: (newValue) {
+                              if (newValue != null) phone = newValue;
+                            },
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'Phone Number',
+                              hintText: '25261123456',
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          TextFormField(
+                            keyboardType: TextInputType.number,
+                            validator: (value) {
+                              if (value != null) if (value.isEmpty)
+                                return 'Field required';
+                            },
+                            onSaved: (newValue) {
+                              if (newValue != null)
+                                amount = double.tryParse(newValue) ?? 0;
+                            },
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'Amount',
+                              hintText: '0.5',
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 16),
